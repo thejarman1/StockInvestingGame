@@ -17,11 +17,17 @@
         <p>Ticker Symbol</p>
         <input id="tickerSymbol" type="text" value="E.G. AAPL"/>
         <br />
+        <br />
         <input type="button" id="btnGetStocks" value="Display Stocks" />
     </form>
 
     <div id="result"></div>
  
+    <br />
+
+     <a asp-action="Buy" class="btn btn-primary" style="width: 150px">Buy</a>
+     <a asp-action="Sell" class="btn btn-primary" style="width: 150px">Sell</a>
+     <a asp-action="Index" class="btn btn-primary" style="width: 150px">Hold</a>
 </div>
 
 @section Scripts
