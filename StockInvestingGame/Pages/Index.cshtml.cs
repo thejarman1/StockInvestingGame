@@ -45,6 +45,33 @@ namespace StockInvestingGame.Pages
             }
             
         }
+        public IActionResult OnPostGetStocksSlider(int date, string value)
+        {
+            try
+            {
+                var symbol = value; //Setting the ticker symbol to what the user has entered
+                var apiKey = "YQ12ME2NUXQ29XG8"; //I got this key by registering my email. You all might wanna do the same or use mine?
+                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={apiKey}&datatype=csv"
+                    .GetStringFromUrl().FromCsv<List<StockData>>();
+
+                //This fills the object with values
+                dailyPrices.PrintDump();
+
+                DateTime testDate = DateTime.Today.AddDays(-date); //This is a random date I chose for testing
+                var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
+                var dayPrice = day.Max(u => u.Close);//This gets the price
+
+
+                return new JsonResult("Getting data for " + symbol + "<br> Date: " + testDate + "<br> Closing price: $" + dayPrice);
+
+            }
+            catch (Exception)
+            {
+                return new JsonResult("Ticker symbol not found. Check your spelling?");
+
+            }
+
+        }
 
         //This will handle the logic for purchasing a stock
         public IActionResult OnPostBuyStocks()
