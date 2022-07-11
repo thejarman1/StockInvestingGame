@@ -23,6 +23,10 @@
         <br />
         <input type="button" class="game-button" role="button" id="btnBuy" value="Buy" />
         <input type="button" class="game-button" role="button" id="btnSell" value="Sell" />
+        <br />
+        <p>Enter number of shares to buy/sell</p>
+        <input id="shareCount" type="text" value="" />
+        <br />
         <input type="button" class="game-button" role="button" id="btnHold" value="Hold" />
 
         <div class="container">
@@ -37,11 +41,13 @@
     </form>
 
     <div class="text-center" id="result"></div>
+    <div class="text-center" id="balanceResults"></div>
 
 </div>
 
 @section Scripts
     {
+    <!--DISPLAYING STOCK PRICE-->
     <script type="text/javascript">
 
         $("#btnGetStocks").click(function() {
@@ -63,6 +69,7 @@
 
         });
     </script>
+    <!--SLIDER-->
     <script>
         var slider = document.getElementById("myRange");
         var output = document.getElementById("value");
@@ -87,9 +94,31 @@
                     "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
                 },
                 success: function(message) {
-                    document.getElementById("result").innerHTML = message;
+                    document.getElementById("results").innerHTML = message;
                 }
             })
         })
+    </script>
+
+    <script type="text/javascript">
+
+        $("#btnBuy").click(function() {
+            var shareCount = $('#shareCount').val();
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=BuyStocks",
+                data: { "value": shareCount },
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function(message) {
+                    document.getElementById("balanceResults").innerHTML = message;
+                }
+            });
+
+        });
     </script>
 }
