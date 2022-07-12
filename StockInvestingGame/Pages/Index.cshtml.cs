@@ -12,7 +12,7 @@ namespace StockInvestingGame.Pages
     {
         public decimal balance = 0; //Stores current balance as global variable
         public decimal price = 0; //Stores the current price of the day
-        public int sharesHeld = 0; //Store the amount of shares currently held
+        
 
 
         private readonly ILogger<IndexModel> _logger;
@@ -105,7 +105,7 @@ namespace StockInvestingGame.Pages
                 {
                     var iSessionShares = HttpContext.Session.GetInt32("shares"); //Getting sessions shares
                     int shares = iSessionShares.Value; //Have to convert nullable int to int
-                    int iAddedShares = sharesHeld + value;
+                    int iAddedShares = shares + value;
 
                     HttpContext.Session.SetInt32("shares", iAddedShares); //Setting session shares held
                     HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
