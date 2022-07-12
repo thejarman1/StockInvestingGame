@@ -109,7 +109,7 @@ namespace StockInvestingGame.Pages
 
                     HttpContext.Session.SetInt32("shares", iAddedShares); //Setting session shares held
                     HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
-                    return new JsonResult(value + " share(s) purchased. <br> Current Balance: $" + total);
+                    return new JsonResult(value + " share(s) purchased. <br> Current Balance: $" + total + "<br> Shares Held: " + iAddedShares);
 
                 }
 
@@ -148,7 +148,7 @@ namespace StockInvestingGame.Pages
                     int iSubtractedShares = ownedShares - value;
                     HttpContext.Session.SetInt32("shares", iSubtractedShares); //Setting session shares held
                     HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
-                    return new JsonResult(value + " share(s) sold. <br> Current Balance: $" + total);
+                    return new JsonResult(value + " share(s) sold. <br> Current Balance: $" + total + "<br> Shares Held: " + iSubtractedShares);
 
                 }
 

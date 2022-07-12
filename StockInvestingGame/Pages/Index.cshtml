@@ -13,8 +13,10 @@
     <form id="form1" runat="server">
         <p>You are given $10,000 to invest in the stock market. You are placed on a random day, at least six months in the past. You are able to buy, sell, or hold for a total of 7 days. Good luck!</p>
         <br />
-
-        <p>Enter Ticker Symbol Below</p>
+        <div class="text-center" id="result">Enter Ticker Symbol Below</div>
+        <div class="text-center" id="balanceResults"></div>
+        <br />
+        
         <input id="tickerSymbol" type="text" value="E.G. AAPL" />
         <br />
         <br />
@@ -26,6 +28,7 @@
         <br />
         <p>Enter number of shares to buy/sell</p>
         <input id="shareCount" type="text" value="" />
+        <br />
         <br />
         <input type="button" class="game-button" role="button" id="btnHold" value="Hold" />
 
@@ -40,8 +43,8 @@
         </div>
     </form>
 
-    <div class="text-center" id="result"></div>
-    <div class="text-center" id="balanceResults"></div>
+    
+    
 
 </div>
 
