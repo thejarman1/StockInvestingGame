@@ -9,13 +9,13 @@
 <div class="text-center">
     <h1 class="display-4">Stock Investing</h1>
     <h3 class="display-8">Practice your investing skills!</h3>
-    
+
     <form id="form1" runat="server">
         <p>You are given $10,000 to invest in the stock market. You are placed on a random day, at least six months in the past. You are able to buy, sell, or hold for a total of 7 days. Good luck!</p>
         <br />
 
         <p>Enter Ticker Symbol Below</p>
-        <input id="tickerSymbol" type="text" value="E.G. AAPL"/>
+        <input id="tickerSymbol" type="text" value="E.G. AAPL" />
         <br />
         <br />
         <input type="button" class="game-button" role="button" id="btnGetStocks" value="Begin Game" />
@@ -23,16 +23,31 @@
         <br />
         <input type="button" class="game-button" role="button" id="btnBuy" value="Buy" />
         <input type="button" class="game-button" role="button" id="btnSell" value="Sell" />
+        <br />
+        <p>Enter number of shares to buy/sell</p>
+        <input id="shareCount" type="text" value="" />
+        <br />
         <input type="button" class="game-button" role="button" id="btnHold" value="Hold" />
 
+        <div class="container">
+            <div class="row pt-2 justify-content-center">
+                <div class="col-4">
+                    <label for="customRange2" class="form-label">Days in the Past</label>
+                    <input type="range" class="form-range" min="0" max="60" step="1" id="myRange">
+                    <span id="value"></span>
+                </div>
+            </div>
+        </div>
     </form>
 
     <div class="text-center" id="result"></div>
- 
+    <div class="text-center" id="balanceResults"></div>
+
 </div>
 
 @section Scripts
     {
+    <!--DISPLAYING STOCK PRICE-->
     <script type="text/javascript">
 
         $("#btnGetStocks").click(function() {
@@ -49,6 +64,58 @@
                 },
                 success: function(message) {
                     document.getElementById("result").innerHTML = message;
+                }
+            });
+
+        });
+    </script>
+    <!--SLIDER-->
+    <script>
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("value");
+
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+            output.innerHTML = slider.value;
+        }
+
+        slider.addEventListener("mouseup", function() {
+            var x = slider.value;
+            var tickerSymbol = $('#tickerSymbol').val();
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=GetStocksSlider",
+                data: { "date": x, "value": tickerSymbol},
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function(message) {
+                    document.getElementById("results").innerHTML = message;
+                }
+            })
+        })
+    </script>
+
+    <script type="text/javascript">
+
+        $("#btnBuy").click(function() {
+            var shareCount = $('#shareCount').val();
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=BuyStocks",
+                data: { "value": shareCount },
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function(message) {
+                    document.getElementById("balanceResults").innerHTML = message;
                 }
             });
 
