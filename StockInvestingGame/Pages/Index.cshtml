@@ -99,7 +99,7 @@
             })
         })
     </script>
-
+    <!--BUY BUTTON-->
     <script type="text/javascript">
 
         $("#btnBuy").click(function() {
@@ -107,6 +107,28 @@
             $.ajax({
                 type: "POST",
                 url: "/Index?handler=BuyStocks",
+                data: { "value": shareCount },
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                headers:
+                {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function(message) {
+                    document.getElementById("balanceResults").innerHTML = message;
+                }
+            });
+
+        });
+    </script>
+     <!--SELL BUTTON-->
+    <script type="text/javascript">
+
+        $("#btnSell").click(function() {
+            var shareCount = $('#shareCount').val();
+            $.ajax({
+                type: "POST",
+                url: "/Index?handler=SellStocks",
                 data: { "value": shareCount },
                 contentType: 'application/x-www-form-urlencoded',
                 dataType: "json",

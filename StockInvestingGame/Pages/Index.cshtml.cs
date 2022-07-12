@@ -13,7 +13,7 @@ namespace StockInvestingGame.Pages
         public decimal balance = 0; //Stores current balance as global variable
         public decimal price = 0; //Stores the current price of the day
         public int sharesHeld = 0; //Store the amount of shares currently held
-        
+
 
         private readonly ILogger<IndexModel> _logger;
 
@@ -53,7 +53,7 @@ namespace StockInvestingGame.Pages
                 return new JsonResult("Ticker symbol not found. Check your spelling?");
 
             }
-            
+
         }
         public IActionResult OnPostGetStocksSlider(int date, string value)
         {
@@ -70,7 +70,7 @@ namespace StockInvestingGame.Pages
                 DateTime testDate = DateTime.Today.AddDays(-date); //This is a random date I chose for testing
                 var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
                 var dayPrice = day.Max(u => u.Close);//This gets the price
-                
+
 
 
                 return new JsonResult("Getting data for " + symbol + "<br> Date: " + testDate + "<br> Closing price: $" + dayPrice);
@@ -96,8 +96,8 @@ namespace StockInvestingGame.Pages
 
                 decimal totalBuyingPrice = price * value;
                 decimal total = balance - totalBuyingPrice;
-                
-                if (total > balance)
+
+                if (total < 0)
                 {
                     return new JsonResult("You do not have any money to purchase that amount!");
                 }
@@ -105,15 +105,15 @@ namespace StockInvestingGame.Pages
                 {
                     var iSessionShares = HttpContext.Session.GetInt32("shares"); //Getting sessions shares
                     int shares = iSessionShares.Value; //Have to convert nullable int to int
-                    iSessionShares = sharesHeld + value;
-                    balance = total;
-                    HttpContext.Session.SetInt32("shares", shares); //Setting session shares held
+                    int iAddedShares = sharesHeld + value;
+
+                    HttpContext.Session.SetInt32("shares", iAddedShares); //Setting session shares held
                     HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
-                    return new JsonResult(value + "share(s) purchased. <br> Current Balance: $" + balance);
+                    return new JsonResult(value + " share(s) purchased. <br> Current Balance: $" + total);
 
                 }
 
-                
+
 
             }
             catch (Exception)
@@ -124,18 +124,38 @@ namespace StockInvestingGame.Pages
 
         }
         //This will handle the logic for selling stocks
-        public IActionResult OnPostSellStocks()
+        public IActionResult OnPostSellStocks(int value)
         {
             try
             {
+                string sSessionPrice = HttpContext.Session.GetString("price"); //Getting session price
+                string sSessionBalance = HttpContext.Session.GetString("balance"); //Getting session balance
+                var iSessionShares = HttpContext.Session.GetInt32("shares"); //Getting sessions shares
+                int ownedShares = iSessionShares.Value; //Have to convert nullable-int to int
+                balance = Convert.ToDecimal(sSessionBalance);
+                price = Convert.ToDecimal(sSessionPrice);
 
+                decimal totalSellingPrice = price * value;
+                decimal total = balance + totalSellingPrice;
 
-                return new JsonResult("");
+                //Checking if the amount of shares being sold are greater than the amount of shares owned
+                if (value > ownedShares)
+                {
+                    return new JsonResult("You do not have enough shares to sell!");
+                }
+                else
+                {
+                    int iSubtractedShares = ownedShares - value;
+                    HttpContext.Session.SetInt32("shares", iSubtractedShares); //Setting session shares held
+                    HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
+                    return new JsonResult(value + " share(s) sold. <br> Current Balance: $" + total);
+
+                }
 
             }
             catch (Exception)
             {
-                return new JsonResult("");
+                return new JsonResult("There was a problem selling these stocks!");
 
             }
 
@@ -183,7 +203,7 @@ namespace StockInvestingGame.Pages
         //********************HELPER FUNCTIONS********************
 
         //We can use this funciton to help with randomizing the date. Need to code the logic
-        public int DateRandomizer ()
+        public int DateRandomizer()
         {
             return 1;
         }
