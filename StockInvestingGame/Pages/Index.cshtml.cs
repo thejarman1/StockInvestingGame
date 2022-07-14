@@ -23,20 +23,20 @@ namespace StockInvestingGame.Pages
         }
 
         //Retrieves stock data in a clump and returns the data
-        //TODO:  possibly chart creation (most likely a separate function), randomizing the date
+        //TODO:  possibly chart creation (most likely a separate function)
         public IActionResult OnPostGetStocks(string value)
         {
             try
             {
                 var symbol = value; //Setting the ticker symbol to what the user has entered
                 var apiKey = "YQ12ME2NUXQ29XG8"; //I got this key by registering my email. You all might wanna do the same or use mine?
-                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={apiKey}&datatype=csv"
+                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=full&apikey={apiKey}&datatype=csv"
                     .GetStringFromUrl().FromCsv<List<StockData>>();
 
                 //This fills the object with values
                 dailyPrices.PrintDump();
 
-                var testDate = new DateTime(2022, 7, 6); //This is a random date I chose for testing
+                var testDate = GetRandomDate(); //Getting a random date for closing stock price
                 var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
                 var dayPrice = day.Max(u => u.Close);//This gets the price
                 price = dayPrice; //Setting the global price to = the day price
@@ -61,13 +61,13 @@ namespace StockInvestingGame.Pages
             {
                 var symbol = value; //Setting the ticker symbol to what the user has entered
                 var apiKey = "YQ12ME2NUXQ29XG8"; //I got this key by registering my email. You all might wanna do the same or use mine?
-                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={apiKey}&datatype=csv"
+                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=full&apikey={apiKey}&datatype=csv"
                     .GetStringFromUrl().FromCsv<List<StockData>>();
 
                 //This fills the object with values
                 dailyPrices.PrintDump();
 
-                DateTime testDate = DateTime.Today.AddDays(-date); //This is a random date I chose for testing
+                DateTime testDate = GetRandomDate(); //This is a random date I chose for testing
                 var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
                 var dayPrice = day.Max(u => u.Close);//This gets the price
 
@@ -202,10 +202,14 @@ namespace StockInvestingGame.Pages
 
         //********************HELPER FUNCTIONS********************
 
-        //We can use this funciton to help with randomizing the date. Need to code the logic
-        public int DateRandomizer()
+        //This function generates a random date for the stock API
+        private DateTime GetRandomDate()
         {
-            return 1;
+            var random = new Random();
+            var startDate = DateTime.Now.AddYears(-20);
+            var endDate = DateTime.Now.AddMonths(-6);
+            var range = Convert.ToInt32(endDate.Subtract(startDate).TotalDays);
+            return startDate.AddDays(random.Next(range));
         }
 
 
