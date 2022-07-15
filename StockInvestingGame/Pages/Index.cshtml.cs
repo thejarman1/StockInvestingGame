@@ -37,21 +37,26 @@ namespace StockInvestingGame.Pages
                 //This fills the object with values
                 dailyPrices.PrintDump();
 
-                var testDate = GetRandomDate(); //Getting a random date for closing stock price
-                var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
-                var dayPrice = day.Max(u => u.Close);//This gets the price
+                int lastIndex = dailyPrices.Count() - 1; //This is used to get the total amount of indices in the list. For random generation
+                var testDate = GetRandomDate(lastIndex); //Getting a random indices for closing stock price
+                string dateString = dailyPrices[testDate].Timestamp.ToString();
+                
+                //This grabs the objects day
+                var dayPrice = dailyPrices[testDate].Close;//This gets the price
                 price = dayPrice; //Setting the global price to = the day price
-                string displayResults = ("Getting data for " + value + "<br> Date: " + testDate + "<br> Closing price: $" + dayPrice);
+                string displayResults = ("Getting data for " + value + "<br> Date: " + dateString + "<br> Closing price: $" + dayPrice);
+                //SESSION VARIABLES
+                //HttpContext.Session.SetString("currentDate", dateString);
                 HttpContext.Session.SetString("balance", "10000");
                 HttpContext.Session.SetString("price", price.ToString());
                 HttpContext.Session.SetInt32("shares", 0);
-                HttpContext.Session.SetInt32("currentDay", testDate.Day);
+                HttpContext.Session.SetInt32("currentDay", testDate);
                 return new JsonResult(displayResults);
 
             }
             catch (Exception)
             {
-                return new JsonResult("Ticker symbol not found. Check your spelling?");
+                return new JsonResult("Ticker symbol not found or random date is not a trading day. Try again.");
 
             }
 
@@ -78,6 +83,8 @@ namespace StockInvestingGame.Pages
             {
                 string sSessionPrice = HttpContext.Session.GetString("price"); //Getting session price
                 string sSessionBalance = HttpContext.Session.GetString("balance"); //Getting session balance
+                string sDate = HttpContext.Session.GetString("currentDate");
+                var dDate = DateTime.Parse("date");
                 var testDate = new DateTime(2022, 7, 6);
                 var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
                 int currentDayNum = iCurrentDay.Value;
@@ -88,7 +95,7 @@ namespace StockInvestingGame.Pages
                 while ((iCurrentDay - testDate.Day) <= 7)
                 {
                     decimal totalBuyingPrice = price * value;
-                decimal total = balance - totalBuyingPrice;
+                    decimal total = balance - totalBuyingPrice;
                 
 
                     if (total < 0)
@@ -239,13 +246,13 @@ namespace StockInvestingGame.Pages
         //********************HELPER FUNCTIONS********************
 
         //This function generates a random date for the stock API
-        private DateTime GetRandomDate()
+        private int GetRandomDate(int indicesCount)
         {
             var random = new Random();
-            var startDate = DateTime.Now.AddYears(-20);
-            var endDate = DateTime.Now.AddMonths(-6);
-            var range = Convert.ToInt32(endDate.Subtract(startDate).TotalDays);
-            return startDate.AddDays(random.Next(range));
+            var range = indicesCount - 60;
+            var newDate = random.Next(range);
+
+            return newDate;
         }
         //Incrementing function
        /* public void IncrementDay()
