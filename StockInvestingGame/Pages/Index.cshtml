@@ -38,6 +38,10 @@
             </div>
         </div>
         <input type="button" class="game-button" role="button" id="btnHold" value="Hold" />
+        <br />
+        <div>
+            <canvas id="myChart"></canvas>
+        </div>
 
         
     </form>
@@ -145,4 +149,32 @@
 
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+  const labels = [
+    'Balance',
+    'Shares',
+  ];
+
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'Number of shares',
+      backgroundColor: 'rgb(0, 165, 255)',
+      data: [0, 10, 5, 2, 20, 30, 45],
+    }]
+  };
+
+  const config = {
+    type: 'doughnut',
+    data: data,
+  };
+</script>
+<script>
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+</script>
+
 }

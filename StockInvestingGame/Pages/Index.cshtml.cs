@@ -59,26 +59,12 @@ namespace StockInvestingGame.Pages
         {
             try
             {
-                var symbol = value; //Setting the ticker symbol to what the user has entered
-                var apiKey = "YQ12ME2NUXQ29XG8"; //I got this key by registering my email. You all might wanna do the same or use mine?
-                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=full&apikey={apiKey}&datatype=csv"
-                    .GetStringFromUrl().FromCsv<List<StockData>>();
-
-                //This fills the object with values
-                dailyPrices.PrintDump();
-
-                DateTime testDate = GetRandomDate(); //This is a random date I chose for testing
-                var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
-                var dayPrice = day.Max(u => u.Close);//This gets the price
-
-
-
-                return new JsonResult("Getting data for " + symbol + "<br> Date: " + testDate + "<br> Closing price: $" + dayPrice);
+                return new JsonResult("");
 
             }
             catch (Exception)
             {
-                return new JsonResult("Ticker symbol not found. Check your spelling?");
+                return new JsonResult("");
 
             }
 
