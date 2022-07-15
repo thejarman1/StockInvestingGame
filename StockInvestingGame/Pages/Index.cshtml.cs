@@ -12,6 +12,7 @@ namespace StockInvestingGame.Pages
     {
         public decimal balance = 0; //Stores current balance as global variable
         public decimal price = 0; //Stores the current price of the day
+        public int dayNum = 0;
         
 
 
@@ -21,7 +22,7 @@ namespace StockInvestingGame.Pages
         {
             _logger = logger;
         }
-
+        
         //Retrieves stock data in a clump and returns the data
         //TODO:  possibly chart creation (most likely a separate function)
         public IActionResult OnPostGetStocks(string value)
@@ -44,7 +45,7 @@ namespace StockInvestingGame.Pages
                 HttpContext.Session.SetString("balance", "10000");
                 HttpContext.Session.SetString("price", price.ToString());
                 HttpContext.Session.SetInt32("shares", 0);
-
+                HttpContext.Session.SetInt32("currentDay", testDate.Day);
                 return new JsonResult(displayResults);
 
             }
@@ -77,37 +78,43 @@ namespace StockInvestingGame.Pages
             {
                 string sSessionPrice = HttpContext.Session.GetString("price"); //Getting session price
                 string sSessionBalance = HttpContext.Session.GetString("balance"); //Getting session balance
+                var testDate = new DateTime(2022, 7, 6);
+                var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
+                int currentDayNum = iCurrentDay.Value;
                 balance = Convert.ToDecimal(sSessionBalance);
                 price = Convert.ToDecimal(sSessionPrice);
-
-                decimal totalBuyingPrice = price * value;
+                currentDayNum++;
+                HttpContext.Session.SetInt32("currentDay", currentDayNum);
+                while ((iCurrentDay - testDate.Day) <= 7)
+                {
+                    decimal totalBuyingPrice = price * value;
                 decimal total = balance - totalBuyingPrice;
+                
 
-                if (total < 0)
-                {
-                    return new JsonResult("You do not have any money to purchase that amount!");
+                    if (total < 0)
+                    {
+                        return new JsonResult("You do not have any money to purchase that amount!");
+                    }
+                    else
+                    {
+                        var iSessionShares = HttpContext.Session.GetInt32("shares"); //Getting sessions shares
+                        int shares = iSessionShares.Value; //Have to convert nullable int to int
+                        int iAddedShares = shares + value;
+
+                        HttpContext.Session.SetInt32("shares", iAddedShares); //Setting session shares held
+                        HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
+                        return new JsonResult(value + " share(s) purchased. <br> Current Balance: $" + total + "<br> Shares Held: " + iAddedShares + " Day: " + iCurrentDay);
+
+                    }
+
                 }
-                else
-                {
-                    var iSessionShares = HttpContext.Session.GetInt32("shares"); //Getting sessions shares
-                    int shares = iSessionShares.Value; //Have to convert nullable int to int
-                    int iAddedShares = shares + value;
-
-                    HttpContext.Session.SetInt32("shares", iAddedShares); //Setting session shares held
-                    HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
-                    return new JsonResult(value + " share(s) purchased. <br> Current Balance: $" + total + "<br> Shares Held: " + iAddedShares);
-
-                }
-
-
-
+                return new JsonResult(" ");
             }
             catch (Exception)
             {
                 return new JsonResult("There was a problem purchasing that amount!");
 
             }
-
         }
         //This will handle the logic for selling stocks
         public IActionResult OnPostSellStocks(int value)
@@ -116,35 +123,43 @@ namespace StockInvestingGame.Pages
             {
                 string sSessionPrice = HttpContext.Session.GetString("price"); //Getting session price
                 string sSessionBalance = HttpContext.Session.GetString("balance"); //Getting session balance
+                var testDate = new DateTime(2022, 7, 6);
+                var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
+                int currentDayNum = iCurrentDay.Value;
                 var iSessionShares = HttpContext.Session.GetInt32("shares"); //Getting sessions shares
                 int ownedShares = iSessionShares.Value; //Have to convert nullable-int to int
                 balance = Convert.ToDecimal(sSessionBalance);
                 price = Convert.ToDecimal(sSessionPrice);
-
-                decimal totalSellingPrice = price * value;
-                decimal total = balance + totalSellingPrice;
-
-                //Checking if the amount of shares being sold are greater than the amount of shares owned
-                if (value > ownedShares)
+                currentDayNum++;
+                HttpContext.Session.SetInt32("currentDay", currentDayNum);
+                while ((iCurrentDay - testDate.Day) <= 7)
                 {
-                    return new JsonResult("You do not have enough shares to sell!");
-                }
-                else
-                {
-                    int iSubtractedShares = ownedShares - value;
-                    HttpContext.Session.SetInt32("shares", iSubtractedShares); //Setting session shares held
-                    HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
-                    return new JsonResult(value + " share(s) sold. <br> Current Balance: $" + total + "<br> Shares Held: " + iSubtractedShares);
+                    decimal totalSellingPrice = price * value;
+                    decimal total = balance + totalSellingPrice;
 
+
+                    //Checking if the amount of shares being sold are greater than the amount of shares owned
+                    if (value > ownedShares)
+                    {
+                        return new JsonResult("You do not have enough shares to sell!");
+                    }
+                    else
+                    {
+                        int iSubtractedShares = ownedShares - value;
+                        HttpContext.Session.SetInt32("shares", iSubtractedShares); //Setting session shares held
+                        HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
+                        return new JsonResult(value + " share(s) sold. <br> Current Balance: $" + total + "<br> Shares Held: " + iSubtractedShares + " Day: " + iCurrentDay);
+
+                    }
                 }
 
+                return new JsonResult(" ");
             }
             catch (Exception)
             {
                 return new JsonResult("There was a problem selling these stocks!");
 
             }
-
         }
 
         //This will handle the logic for the user selecting "Hold"
@@ -153,8 +168,43 @@ namespace StockInvestingGame.Pages
             try
             {
 
+                var testDate = new DateTime(2022, 7, 6);
+                var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
+                int currentDayNum = iCurrentDay.Value;
+                currentDayNum++;
+                HttpContext.Session.SetInt32("currentDay", currentDayNum);
+                while ((iCurrentDay - testDate.Day) <= 7)
+                {
+                    return new JsonResult(" Day: " + iCurrentDay);
+                }
+                return new JsonResult(" ");
 
+
+            }
+            catch (Exception)
+            {
                 return new JsonResult("");
+
+            }
+
+        }
+
+        //This will handle the logic for the user selecting "Quit"
+        public IActionResult OnPostQuit()
+        {
+            try
+            {
+
+                var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
+                int currentDayNum = iCurrentDay.Value;
+                currentDayNum++;
+                HttpContext.Session.SetInt32("currentDay", currentDayNum);
+                while (iCurrentDay <= 7)
+                {
+                    return new JsonResult(" Day: " + iCurrentDay);
+                }
+                return new JsonResult(" ");
+
 
             }
             catch (Exception)
@@ -197,7 +247,15 @@ namespace StockInvestingGame.Pages
             var range = Convert.ToInt32(endDate.Subtract(startDate).TotalDays);
             return startDate.AddDays(random.Next(range));
         }
-
+        //Incrementing function
+       /* public void IncrementDay()
+        {
+            var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
+            int currentDayNum = iCurrentDay.Value;
+            currentDayNum++;
+            HttpContext.Session.SetInt32("currentDay", currentDayNum);
+        }
+       */
 
     }
 }

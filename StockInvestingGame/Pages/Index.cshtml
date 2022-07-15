@@ -38,10 +38,6 @@
             </div>
         </div>
         <input type="button" class="game-button" role="button" id="btnHold" value="Hold" />
-        <br />
-        <div>
-            <canvas id="myChart"></canvas>
-        </div>
 
         
     </form>
@@ -54,102 +50,121 @@
 @section Scripts
     {
     <!--DISPLAYING STOCK PRICE-->
+
     <script type="text/javascript">
-
-        $("#btnGetStocks").click(function() {
-            var tickerSymbol = $('#tickerSymbol').val();
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=GetStocks",
-                data: { "value": tickerSymbol },
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: function(message) {
-                    document.getElementById("result").innerHTML = message;
-                }
-            });
-
+    $("#btnGetStocks").click(function() {
+        var tickerSymbol = $('#tickerSymbol').val();
+        $.ajax({
+            type: "POST",
+            url: "/Index?handler=GetStocks",
+            data: { "value": tickerSymbol },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(message) {
+                document.getElementById("result").innerHTML = message;
+            }
         });
-    </script>
+    });
+</script>
     <!--SLIDER-->
     <script>
-        var slider = document.getElementById("myRange");
-        var output = document.getElementById("value");
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("value");
 
+    output.innerHTML = slider.value;
+
+    slider.oninput = function() {
         output.innerHTML = slider.value;
+    }
 
-        slider.oninput = function() {
-            output.innerHTML = slider.value;
-        }
-
-        slider.addEventListener("mouseup", function() {
-            var x = slider.value;
-            var tickerSymbol = $('#tickerSymbol').val();
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=GetStocksSlider",
-                data: { "date": x, "value": tickerSymbol},
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: function(message) {
-                    document.getElementById("results").innerHTML = message;
-                }
-            })
+    slider.addEventListener("mouseup", function() {
+        var x = slider.value;
+        var tickerSymbol = $('#tickerSymbol').val();
+        $.ajax({
+            type: "POST",
+            url: "/Index?handler=GetStocksSlider",
+            data: { "date": x, "value": tickerSymbol },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(message) {
+                document.getElementById("results").innerHTML = message;
+            }
         })
-    </script>
+    })
+</script>
     <!--BUY BUTTON-->
     <script type="text/javascript">
 
-        $("#btnBuy").click(function() {
-            var shareCount = $('#shareCount').val();
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=BuyStocks",
-                data: { "value": shareCount },
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: function(message) {
-                    document.getElementById("balanceResults").innerHTML = message;
-                }
-            });
-
+    $("#btnBuy").click(function() {
+        var shareCount = $('#shareCount').val();
+        $.ajax({
+            type: "POST",
+            url: "/Index?handler=BuyStocks",
+            data: { "value": shareCount },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(message) {
+                document.getElementById("balanceResults").innerHTML = message;
+            }
         });
-    </script>
+    });
+</script>
      <!--SELL BUTTON-->
     <script type="text/javascript">
 
-        $("#btnSell").click(function() {
-            var shareCount = $('#shareCount').val();
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=SellStocks",
-                data: { "value": shareCount },
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: function(message) {
-                    document.getElementById("balanceResults").innerHTML = message;
-                }
-            });
-
+    $("#btnSell").click(function() {
+        var shareCount = $('#shareCount').val();
+        $.ajax({
+            type: "POST",
+            url: "/Index?handler=SellStocks",
+            data: { "value": shareCount },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(message) {
+                document.getElementById("balanceResults").innerHTML = message;
+            }
         });
+    });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+     <!--HOLD BUTTON-->
+    <script type="text/javascript">
+
+    $("#btnHold").click(function() {
+        var shareCount = $('#shareCount').val();
+        $.ajax({
+            type: "POST",
+            url: "/Index?handler=Hold",
+            data: { "value": shareCount },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(message) {
+                document.getElementById("balanceResults").innerHTML = message;
+            }
+        });
+    });
+    </script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
   const labels = [
     'Balance',
@@ -176,5 +191,25 @@
     config
   );
 </script>
+   <!--QUIT BUTTON-->
+    <script type="text/javascript">
 
+    $("#btnQuit").click(function() {
+        var shareCount = $('#shareCount').val();
+        $.ajax({
+            type: "POST",
+            url: "/Index?handler=Quit",
+            data: { "value": shareCount },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(message) {
+                document.getElementById("balanceResults").innerHTML = message;
+            }
+        });
+    });
+    </script>
 }
