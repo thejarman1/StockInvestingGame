@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Chart.js" Version="3.7.1" />
+    <PackageReference Include="jQuery" Version="3.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="ServiceStack.Text" Version="6.1.0" />
     <PackageReference Include="YahooFinanceApi" Version="2.1.2" />

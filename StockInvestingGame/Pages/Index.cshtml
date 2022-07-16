@@ -5,7 +5,7 @@
 }
 @Html.AntiForgeryToken()
 
-
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <div class="text-center">
     <h1 class="display-4">Stock Investing</h1>
     <h3 class="display-8">Practice your investing skills!</h3>
@@ -28,16 +28,18 @@
         <br />
         <p>Enter number of shares to buy/sell or drag the slider below</p>
         <input id="shareCount" type="text" value="" />
-        <div class="container">
-            <div class="row pt-2 justify-content-center">
-                <div class="col-4">
-                    <label for="customRange2" class="form-label"></label>
-                    <input type="range" class="form-range" min="0" max="100" step="1" id="myRange">
-                    <span id="value"></span>
-                </div>
-            </div>
-        </div>
+        <div id="slider"></div>
+        <style>
+            #slider {
+                width: 250px;
+                margin: 0 auto;
+            }
+
+            #slider .ui-slider-handle { background: #13aa52; }
+        </style>
+        <br />
         <input type="button" class="game-button" role="button" id="btnHold" value="Hold" />
+        <br />
 
 
     </form>
@@ -50,7 +52,8 @@
 @section Scripts
     {
     <!--DISPLAYING STOCK PRICE-->
-
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script type="text/javascript">
         $("#btnGetStocks").click(function() {
             var tickerSymbol = $('#tickerSymbol').val();
@@ -70,36 +73,30 @@
             });
         });
     </script>
+
     <!--SLIDER-->
-    <script>
-        var slider = document.getElementById("myRange");
-        var output = document.getElementById("value");
-
-        output.innerHTML = slider.value;
-
-        slider.oninput = function() {
-            output.innerHTML = slider.value;
-        }
-
-        slider.addEventListener("mouseup", function() {
-            var x = slider.value;
-            var tickerSymbol = $('#tickerSymbol').val();
-            $.ajax({
-                type: "POST",
-                url: "/Index?handler=GetStocksSlider",
-                data: { "date": x, "value": tickerSymbol },
-                contentType: 'application/x-www-form-urlencoded',
-                dataType: "json",
-                headers:
-                {
-                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
-                },
-                success: function(message) {
-                    document.getElementById("results").innerHTML = message;
+    <script type="text/javascript">
+        $(function() {
+            $("#slider").slider({
+                min: 1, max: 99, step: 1, value: 0,
+                slide: function(event, ui) {
+                    $("#shareCount").val(ui.value);
                 }
-            })
-        })
+            });
+            var initialValue = $("#slider").slider("option", "value");
+            $("#shareCount").val(initialValue);
+            $("#shareCount").change(function() {
+                var oldVal = $("#slider").slider("option", "value");
+                var newVal = $(this).val();
+                if (isNaN(newVal) || newVal < 1 || newVal > 100) {
+                    $("#shareCount").val(oldVal);
+                } else {
+                    $("#slider").slider("option", "value", newVal);
+                }
+            });
+        });
     </script>
+
     <!--BUY BUTTON-->
     <script type="text/javascript">
 
@@ -165,6 +162,7 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!--POSSIBLE CHART, UNUSED FOR NOW-->
     <script>
         const labels = [
             'Balance',
