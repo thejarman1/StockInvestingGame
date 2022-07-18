@@ -13,7 +13,10 @@ namespace StockInvestingGame.Pages
         public decimal balance = 0; //Stores current balance as global variable
         public decimal price = 0; //Stores the current price of the day
         public int dayNum = 0;
-        
+        private int date;
+        public string displayResults;
+        private string symbol;
+        private List<StockData> dailyPrices;
 
 
         private readonly ILogger<IndexModel> _logger;
@@ -29,28 +32,34 @@ namespace StockInvestingGame.Pages
         {
             try
             {
-                var symbol = value; //Setting the ticker symbol to what the user has entered
+                symbol = value; //Setting the ticker symbol to what the user has entered
                 var apiKey = "YQ12ME2NUXQ29XG8"; //I got this key by registering my email. You all might wanna do the same or use mine?
-                var dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=full&apikey={apiKey}&datatype=csv"
+                dailyPrices = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=full&apikey={apiKey}&datatype=csv"
                     .GetStringFromUrl().FromCsv<List<StockData>>();
 
                 //This fills the object with values
                 dailyPrices.PrintDump();
 
+<<<<<<< HEAD
                 int lastIndex = dailyPrices.Count() - 1; //This is used to get the total amount of indices in the list. For random generation
-                var testDate = GetRandomDate(lastIndex); //Getting a random indices for closing stock price
-                string dateString = dailyPrices[testDate].Timestamp.ToString();
+                date = GetRandomDate(lastIndex); //Getting a random indices for closing stock price
+                string dateString = dailyPrices[date].Timestamp.ToString();
                 
                 //This grabs the objects day
-                var dayPrice = dailyPrices[testDate].Close;//This gets the price
+                var dayPrice = dailyPrices[date].Close;//This gets the price
+=======
+                var testDate = GetRandomDate();
+                var day = dailyPrices.Where(u => u.Timestamp.Year == testDate.Year && u.Timestamp.Month == testDate.Month && u.Timestamp.Day == testDate.Day); //This grabs the objects day
+                var dayPrice = day.Max(u => u.Close);//This gets the price
+>>>>>>> acae09cadf7ddd6394561e764ef8c75f1b683240
                 price = dayPrice; //Setting the global price to = the day price
-                string displayResults = ("Getting data for " + value + "<br> Date: " + dateString + "<br> Closing price: $" + dayPrice);
+                displayResults = ("Getting data for " + value + "<br> Date: " + dateString + "<br> Closing price: $" + dayPrice);
                 //SESSION VARIABLES
                 //HttpContext.Session.SetString("currentDate", dateString);
                 HttpContext.Session.SetString("balance", "10000");
                 HttpContext.Session.SetString("price", price.ToString());
                 HttpContext.Session.SetInt32("shares", 0);
-                HttpContext.Session.SetInt32("currentDay", testDate);
+                HttpContext.Session.SetInt32("currentDay", date);
                 HttpContext.Session.SetInt32("dayCounter", 1);
                 return new JsonResult(displayResults);
 
@@ -113,7 +122,8 @@ namespace StockInvestingGame.Pages
                         HttpContext.Session.SetInt32("shares", iAddedShares); //Setting session shares held
                         HttpContext.Session.SetString("balance", total.ToString()); //Setting session balance
                         return new JsonResult(value + " share(s) purchased. <br> Current Balance: $" + total + "<br> Shares Held: " + iAddedShares + "<br> Current Day: " + iDayCounter);
-
+                        string newDate = GetNextDate(currentDayNum);
+                        return new JsonResult(newDate);
                     }
 
                 }
@@ -251,6 +261,7 @@ namespace StockInvestingGame.Pages
 
         //********************HELPER FUNCTIONS********************
 
+<<<<<<< HEAD
         //This function generates a random date for the stock API
         private int GetRandomDate(int indicesCount)
         {
@@ -260,15 +271,41 @@ namespace StockInvestingGame.Pages
 
             return newDate;
         }
-        //Incrementing function
-       /* public void IncrementDay()
-        {
-            var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
-            int currentDayNum = iCurrentDay.Value;
-            currentDayNum++;
-            HttpContext.Session.SetInt32("currentDay", currentDayNum);
-        }
-       */
 
+        public string GetNextDate(int currentDay)
+        {
+            string dateString = dailyPrices[currentDay].Timestamp.ToString();
+
+            //This grabs the objects day
+            var dayPrice = dailyPrices[currentDay].Close;//This gets the price
+            price = dayPrice; //Setting the global price to = the day price
+            displayResults = ("Getting data for " + symbol + "<br> Date: " + dateString + "<br> Closing price: $" + dayPrice);
+            return displayResults;
+        }
+        //Incrementing function
+        /* public void IncrementDay()
+         {
+             var iCurrentDay = HttpContext.Session.GetInt32("currentDay");
+             int currentDayNum = iCurrentDay.Value;
+             currentDayNum++;
+             HttpContext.Session.SetInt32("currentDay", currentDayNum);
+         }
+        */
+
+=======
+        //We can use this funciton to help with randomizing the date. Need to code the logic
+        private DateTime GetRandomDate()
+        {
+            Random rnd = new Random();
+            DateTime datetoday = DateTime.Now;
+
+            int rndYear = 2022;//rnd.Next(2000, datetoday.Year);
+            int rndMonth = rnd.Next(4, 6);//rnd.Next(1,12);
+            int rndDay = rnd.Next(1, 31);//rnd,Next(1,31);
+
+            DateTime generateDate = new DateTime(rndYear, rndMonth, rndDay);
+            return generateDate;
+        }
+>>>>>>> acae09cadf7ddd6394561e764ef8c75f1b683240
     }
 }
